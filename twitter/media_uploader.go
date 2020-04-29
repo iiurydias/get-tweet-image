@@ -102,9 +102,9 @@ func (self *MediaUploader) MediaFinalize(mediaId uint64) error {
 	return nil
 }
 
-func (self *MediaUploader) UpdateStatusWithMedia(inReplyToStatusId, mediaId int64) error {
+func (self *MediaUploader) UpdateStatusWithMedia(name string, inReplyToStatusId, mediaId int64) error {
 	form := url.Values{
-		"status":                []string{""},
+		"status":                []string{`Hey ` + name + `, take your image!`},
 		"in_reply_to_status_id": []string{fmt.Sprint(inReplyToStatusId)},
 		"media_ids":             []string{fmt.Sprint(mediaId)},
 	}
