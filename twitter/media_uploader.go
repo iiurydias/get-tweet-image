@@ -85,7 +85,7 @@ func (self *MediaUploader) MediaAppend(mediaId uint64, media []byte) error {
 	return nil
 }
 
-func (self *MediaUploader) MediaFinilize(mediaId uint64) error {
+func (self *MediaUploader) MediaFinalize(mediaId uint64) error {
 	form := url.Values{
 		"command":  []string{"FINALIZE"},
 		"media_id": []string{fmt.Sprint(mediaId)},
@@ -102,10 +102,11 @@ func (self *MediaUploader) MediaFinilize(mediaId uint64) error {
 	return nil
 }
 
-func (self *MediaUploader) UpdateStatusWithMedia(text string, mediaId uint64) error {
+func (self *MediaUploader) UpdateStatusWithMedia(inReplyToStatusId, mediaId int64) error {
 	form := url.Values{
-		"status":    []string{text},
-		"media_ids": []string{fmt.Sprint(mediaId)},
+		"status":                []string{""},
+		"in_reply_to_status_id": []string{fmt.Sprint(inReplyToStatusId)},
+		"media_ids":             []string{fmt.Sprint(mediaId)},
 	}
 	content := strings.NewReader(form.Encode())
 	res, err := self.makeRequest(http.MethodPost, StatusUpdate, FormContentType, content)

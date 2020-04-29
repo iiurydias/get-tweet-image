@@ -89,6 +89,9 @@ func (g *Generator) Generate(text, name string) (string, error) {
 }
 
 func (g *Generator) SavePNG(filename string) error {
+	if err := createTempDir(); err != nil {
+		return err
+	}
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -99,6 +102,16 @@ func (g *Generator) SavePNG(filename string) error {
 	}
 	if err := f.Close(); err != nil {
 		return err
+	}
+	return nil
+}
+
+func createTempDir() error {
+	if _, err := os.Stat("./tmp"); err != nil && !os.IsNotExist(err) {
+		err := os.MkdirAll("./tmp", os.ModePerm)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

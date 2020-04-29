@@ -38,7 +38,7 @@ func main() {
 
 func getConfigParams() Config {
 	var configParams Config
-	err := cfg.LoadFile("./config.json")
+	err := cfg.LoadFile("./config/config.json")
 	if err != nil {
 		log.Fatal("fail to load config file", err.Error())
 	}

@@ -40,7 +40,7 @@ func (h *Handler) Handler(tweet *twitter.Tweet) {
 			log.Println("failed to generate image", err.Error())
 			return
 		}
-		if err = h.publishImage(filePath, "@"+tweet.User.ScreenName); err != nil {
+		if err = h.publishImage(filePath, tweet.ID); err != nil {
 			log.Println(err.Error())
 			return
 		}
@@ -67,7 +67,7 @@ func (h *Handler) checkRepliedTweet(repliedTweet *twitter.Tweet) error {
 	return nil
 }
 
-func (h *Handler) publishImage(filePath, text string) error {
+func (h *Handler) publishImage(filePath string, inReplyToStatusId int64) error {
 	data, _ := ioutil.ReadFile(filePath)
 	media, err := h.mediaUploader.MediaInit(data)
 	if err != nil {
@@ -76,10 +76,10 @@ func (h *Handler) publishImage(filePath, text string) error {
 	if err = h.mediaUploader.MediaAppend(media.MediaId, data); err != nil {
 		return errors.Wrap(err, "failed to upload image")
 	}
-	if err = h.mediaUploader.MediaFinilize(media.MediaId); err != nil {
+	if err = h.mediaUploader.MediaFinalize(media.MediaId); err != nil {
 		return errors.Wrap(err, "failed to finalize image upload")
 	}
-	if err = h.mediaUploader.UpdateStatusWithMedia(text, media.MediaId); err != nil {
+	if err = h.mediaUploader.UpdateStatusWithMedia(inReplyToStatusId, int64(media.MediaId)); err != nil {
 		return errors.Wrap(err, "failed to finalize image upload")
 	}
 	return nil
