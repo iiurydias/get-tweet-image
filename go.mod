@@ -1,4 +1,4 @@
-module ttwitterProject
+module get-tweet-image
 
 go 1.13
 

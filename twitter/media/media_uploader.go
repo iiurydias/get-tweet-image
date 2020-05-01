@@ -1,4 +1,4 @@
-package twitter
+package media
 
 import (
 	"bytes"
@@ -21,19 +21,13 @@ type MediaUploader struct {
 	client *http.Client
 }
 
-type MediaInitResponse struct {
-	MediaId          uint64 `json:"media_id"`
-	MediaIdString    string `json:"media_id_string"`
-	ExpiresAfterSecs uint64 `json:"expires_after_secs"`
-}
-
 func NewMediaUploader(client *http.Client) IMediaUploader {
-	self := &MediaUploader{}
-	self.client = client
-	return self
+	return &MediaUploader{
+		client: client,
+	}
 }
 
-func (self *MediaUploader) MediaInit(media []byte) (*MediaInitResponse, error) {
+func (self *MediaUploader) MediaInit(media []byte) (*Response, error) {
 	form := url.Values{
 		"command":     []string{"INIT"},
 		"media_type":  []string{"image/png"},
@@ -52,7 +46,7 @@ func (self *MediaUploader) MediaInit(media []byte) (*MediaInitResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	var mediaInitResponse MediaInitResponse
+	var mediaInitResponse Response
 	if err = json.Unmarshal(body, &mediaInitResponse); err != nil {
 		return nil, err
 	}

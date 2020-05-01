@@ -84,7 +84,6 @@ func (g *Generator) Generate(text, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("image was generated and saved")
 	return fileName, nil
 }
 

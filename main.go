@@ -1,50 +1,59 @@
 package main
 
 import (
-	tt "github.com/dghubble/go-twitter/twitter"
-	"github.com/dghubble/oauth1"
-	cfg "github.com/micro/go-micro/config"
+	"context"
+	"get-tweet-image/app"
+	"github.com/micro/go-micro/config"
+	"github.com/pkg/errors"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"ttwitterProject/handlers/tweet"
-	"ttwitterProject/image"
-	"ttwitterProject/twitter"
 )
 
 func main() {
-	configParams := getConfigParams()
-	config := oauth1.NewConfig(configParams.ConsumerKey, configParams.ConsumerSecret)
-	token := oauth1.NewToken(configParams.AccessToken, configParams.AccessSecret)
-	httpClient := config.Client(oauth1.NoContext, token)
-	ttClient := tt.NewClient(httpClient)
-	stream := twitter.NewStream(ttClient)
-	tweetHandler := tweet.NewHandler(ttClient, image.NewGenerator(), twitter.NewMediaUploader(httpClient))
-	stream.SetTweetHandler(tweetHandler.Handler)
-	filterParams := &tt.StreamFilterParams{
-		Track:         []string{configParams.Filter},
-		StallWarnings: tt.Bool(true),
+	err := runApplication("./config/config.json")
+	if err != nil {
+		log.Fatal(err.Error())
 	}
-	if err := stream.SetParams(filterParams); err != nil {
-		log.Fatal(err)
-	}
-	stream.Start()
-	ch := make(chan os.Signal)
-	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-	log.Println(<-ch)
-	stream.Stop()
 }
 
-func getConfigParams() Config {
-	var configParams Config
-	err := cfg.LoadFile("./config/config.json")
+func runApplication(configFileName string) error {
+	configParams, err := getConfigParams(configFileName)
 	if err != nil {
-		log.Fatal("fail to load config file", err.Error())
+		return err
 	}
-	err = cfg.Scan(&configParams)
+	application, err := app.LoadApp(*configParams)
 	if err != nil {
-		log.Fatal("failed to scan file", err.Error())
+		return errors.Wrap(err, "failed to load application")
 	}
-	return configParams
+	ctx := gracefullyShutdown()
+	application.Run()
+	defer application.Close()
+	select {
+	case <-ctx.Done():
+		return errors.New("gracefully shutdown")
+	}
+}
+
+func getConfigParams(configFileName string) (*app.Config, error) {
+	var configParams app.Config
+	if err := config.LoadFile(configFileName); err != nil {
+		return nil, errors.Wrap(err, "failed to load config file")
+	}
+	if err := config.Scan(&configParams); err != nil {
+		return nil, errors.Wrap(err, "failed to scan file")
+	}
+	return &configParams, nil
+}
+
+func gracefullyShutdown() context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGKILL, syscall.SIGINT)
+	go func() {
+		<-quit
+		cancel()
+	}()
+	return ctx
 }

@@ -1,4 +1,4 @@
-package twitter
+package stream
 
 import (
 	"fmt"
@@ -13,8 +13,11 @@ type Stream struct {
 	stream *twitter.Stream
 }
 
-func NewStream(client *twitter.Client) *Stream {
-	return &Stream{client: client, demux: twitter.NewSwitchDemux()}
+func NewStream(client *twitter.Client) IStream {
+	return &Stream{
+		client: client,
+		demux:  twitter.NewSwitchDemux(),
+	}
 }
 
 func (s *Stream) SetTweetHandler(handler HandlerFunc) {

@@ -1,4 +1,4 @@
-package main
+package app
 
 type Config struct {
 	ConsumerKey    string `json:"consumerKey"`
