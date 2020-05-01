@@ -50,7 +50,7 @@ func (self *MediaUploader) MediaInit(media []byte) (*Response, error) {
 	if err = json.Unmarshal(body, &mediaInitResponse); err != nil {
 		return nil, err
 	}
-	fmt.Println(fmt.Sprintf("Initialized upload of media number %d", mediaInitResponse.MediaId))
+	fmt.Println(fmt.Sprintf("initialized upload of media number %d", mediaInitResponse.MediaId))
 	return &mediaInitResponse, nil
 }
 
@@ -75,7 +75,7 @@ func (self *MediaUploader) MediaAppend(mediaId uint64, media []byte) error {
 			return errors.New("request was not accepted on media append")
 		}
 	}
-	fmt.Println(fmt.Sprintf("Media number %d was upploaded", mediaId))
+	fmt.Println(fmt.Sprintf("media number %d was uploaded", mediaId))
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (self *MediaUploader) MediaFinalize(mediaId uint64) error {
 	if res.StatusCode != http.StatusCreated {
 		return errors.New("request was not accepted on media finalized")
 	}
-	fmt.Println(fmt.Sprintf("Media number %d was finalized", mediaId))
+	fmt.Println(fmt.Sprintf("media number %d was finalized", mediaId))
 	return nil
 }
 
@@ -110,7 +110,7 @@ func (self *MediaUploader) UpdateStatusWithMedia(name string, inReplyToStatusId,
 	if res.StatusCode != http.StatusOK {
 		return errors.New("request was not accepted on media append")
 	}
-	fmt.Println(fmt.Sprintf("Media number %d was published", mediaId))
+	fmt.Println(fmt.Sprintf("media number %d was published", mediaId))
 	return nil
 }
 
@@ -138,7 +138,7 @@ func createContentForm(buffer *bytes.Buffer, segmentNumber int, mediaId uint64, 
 	if err := w.WriteField("segment_index", fmt.Sprint(segmentNumber)); err != nil {
 		return "", err
 	}
-	fw, err := w.CreateFormFile("media", "orkutMeGenerated.jpg")
+	fw, err := w.CreateFormFile("media", "get-tt-image-generated.jpg")
 	if err != nil {
 		return "", err
 	}
