@@ -9,7 +9,6 @@ import (
 	"image/png"
 	"math"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -67,11 +66,7 @@ func (g *Generator) Generate(text, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	textWithoutLink := removeLink(text)
-	if text == "" {
-		return "", errors.New("invalid text")
-	}
-	err = g.SetString(`“`+textWithoutLink+`”`, fontTextPath, 45, 150, 80, 1.5, color.RGBA{244, 228, 33, 255})
+	err = g.SetString(`“`+text+`”`, fontTextPath, 45, 150, 80, 1.5, color.RGBA{244, 228, 33, 255})
 	if err != nil {
 		return "", err
 	}
@@ -120,16 +115,4 @@ func getRandomFileName(n int) (str string) {
 	rand.Read(b)
 	str = fmt.Sprintf("%x", b)
 	return
-}
-
-func removeLink(text string) string {
-	valid := regexp.MustCompile(`https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)`)
-	if valid.MatchString(text) {
-		newText := valid.ReplaceAllString(text, "$1W")
-		if len(newText) == 0 {
-			return newText
-		}
-		return newText[:len(newText)-1]
-	}
-	return text
 }

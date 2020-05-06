@@ -18,3 +18,7 @@ func NewClient(client *twitter.Client) IClient {
 func (c *Client) GetTweet(id int64, params *twitter.StatusShowParams) (*twitter.Tweet, *http.Response, error) {
 	return c.client.Statuses.Show(id, params)
 }
+
+func (c *Client) PostTweet(text string, params *twitter.StatusUpdateParams) (*twitter.Tweet, *http.Response, error) {
+	return c.client.Statuses.Update(text, params)
+}

@@ -29,6 +29,15 @@ func (h *Handler) Handler(tweet *twitterDriver.Tweet) {
 			return
 		}
 		if err = h.twitterModule.CheckTweet(repliedTweet); err != nil {
+			if err == h.twitterModule.ErrTooLong() {
+				if _, err = h.twitterModule.PostTweet("This tweet is too long, @"+tweet.User.ScreenName+" :(", &twitterDriver.StatusUpdateParams{
+					InReplyToStatusID: tweet.ID,
+				}); err != nil {
+					log.Println(err.Error())
+					return
+				}
+				return
+			}
 			log.Println(err.Error())
 			return
 		}
