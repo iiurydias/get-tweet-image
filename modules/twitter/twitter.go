@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 const TooLong = tooLong("tweet: too long")
@@ -52,6 +53,9 @@ func (m *Module) CheckTweet(tweet *twitter.Tweet) error {
 	if tweet.User.Protected {
 		return errors.New("tweet owner is protected")
 	}
+	if strings.Contains(tweet.Text, m.filter) {
+		return errors.New("invalid tweet")
+	}
 	tweet.Text = removeLink(tweet.Text)
 	if len(tweet.Text) == 0 {
 		return errors.New("not enough tweet text length")
@@ -69,6 +73,7 @@ func (m *Module) CheckTweet(tweet *twitter.Tweet) error {
 func (m *Module) ErrTooLong() error {
 	return TooLong
 }
+
 func removeLink(text string) string {
 	valid := regexp.MustCompile(`https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)`)
 	if valid.MatchString(text) {
